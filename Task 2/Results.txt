@@ -1,0 +1,61 @@
+Задание выполнялось с двух виртуальных машин:
+- PuTTy -> SSH -> ubuntu
+- debian -> эмулятор терминала KDE
+
+Задание 1. 
+Обе машины
+> ls /etc /home /proc 
+ubuntu
+> vim /etc/mtab 
+debian
+> bim /etc/os-release
+
+Задание 2.
+Используем подсказку
+> man cat
+... cat - cjncatenate files and prin on the standart output
+... cat [option]... [file]...
+... cat f - g Output f's contents, then standart input, then g's content
+> ищем в интернетах. Поисковый запрос в Яндексе: "linux утилита cat"
+Первая ссылка:
+https://losst.ru/komanda-cat-linux
+Название команды - это сокращения от слова catenate. По сути, задача команды cat очень проста - она читает данные из файла или стандартного ввода и выводит их на экран. Это все, чем занимается утилита. Но с помощью ее опций и операторов перенаправления вывода можно сделать очень многое.
+
+Создаём файлы из STDOUT терминала:
+cat > f 
+Hello world
+cat > g
+May the force will be with you
+
+Ещё вариант получить в STDIN для утилиты cat поток из STDOUT утилиты echo:
+echo 'Hello world' | cat > f
+
+Объединяем файлы в третий файл
+cat f g > e
+Переименовываем выходной файл и выводим его в STDIN терминала
+mv e z
+cat < z
+Hello world
+May the force will be with you
+
+Задание 3
+Создаём файлы и вложенный каталог
+for i in {0..9}; do echo $i | cat > old_$i; ls; cat < old_$i; done
+mkdir in
+Переносим файлы и сразу отображаем результат
+for i in {0..9}; do mv old_$i ./in/new_$i; done && echo 'ls' && ls && echo 'ls /in' && ls ./in
+Синтаксис без двоеточий допустим при вводе со сбросом строки:
+for i in {1..3}
+do
+echo $i | cat > $in
+done
+
+Задание 4
+ls -A | grep '^\.' | wc -l
+
+По шагам:
+- получаем список файлов и каталогов (которые тоже считаем файлами - linux way), без родительского и текущего каталогов;
+- находим среди полученных строк те, которые имеют знак точки в начале строки
+- выводим только количество строк
+
+Задание 5
