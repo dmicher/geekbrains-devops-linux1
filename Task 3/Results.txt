@@ -1,0 +1,127 @@
+Задание 1
+~/lesson3$ echo 'some content' > file1
+~/lesson3$ cp file1 file2
+~/lesson3$ ln -s file1 file3
+~/lesson3$ ln file1 file4
+~/lesson3$ ls -ilA
+итого 12
+655398 -rw-r--r-- 2 dmicher dmicher 13 авг 10 01:12 file1
+655554 -rw-r--r-- 1 dmicher dmicher 13 авг 10 01:13 file2
+655555 lrwxrwxrwx 1 dmicher dmicher  5 авг 10 01:13 file3 -> file1
+655398 -rw-r--r-- 2 dmicher dmicher 13 авг 10 01:12 file4
+~/lesson3$ rm file1
+~/lesson3$ ls -ilA
+итого 8
+655554 -rw-r--r-- 1 dmicher dmicher 13 авг 10 01:13 file2
+655555 lrwxrwxrwx 1 dmicher dmicher  5 авг 10 01:13 file3 -> file1
+655398 -rw-r--r-- 1 dmicher dmicher 13 авг 10 01:12 file4
+
+Копия файла осталась: у него своя айнода - это принципиально иной файл, нежели удалённый файл 1. Вывести информацию из этого файла, естественно, будет возможно. Символическая ссылка осталась, но она стала "колотой" (ведущей вникуда). При попытке её чтения, оболочка выдаст ошибку об отсутствии файла, но в каталоге (выводе файлов) она останется. Файл 4, будучи жёсткой ссылкой, останется и его можно будет прочесть.
+
+Задание 2
+~/lesson3$ echo 'some content' > origin
+~/lesson3$ cp origin copy
+~/lesson3$ ln -s origin slink
+~/lesson3$ ln origin link
+~/lesson3$ mkdir links
+~/lesson3$ mv *link links
+~/lesson3$ ls ./links/
+link  slink
+~/lesson3$ cat < ./links/link
+some content
+~/lesson3$ cat < ./links/slink 
+bash: ./links/slink: Нет такого файла или каталога
+
+Пересоздал файлы, т.к. очищаю папку после каждого задания, хотя можно было бы исопльзовать mv. Переместил ссылки в созданную вложенную директорию. Жёсткая ссылка, ссылаясь на ту же айноду, выдаёт нужную информацию. Символьная стала "колотой", т.к. поменяла собственное расположение и реальный относительный путь к файлу-источнику изменился в то время как записанный в ссылке путь не поменялся. При возвращении ссылки на её прежнее место даже с другим именем её работоспособность восстанавливается, т.к. реальный и записанный относительные пути опять совпадают.
+
+Задание 3
+~/lesson3$ echo 'task3.3' > a
+~/lesson3$ cp a b
+~/lesson3$ chmod ug=rw,o=r a
+~/lesson3$ chmod 600 b
+~/lesson3$ ls -l
+итого 8
+-rw-rw-r-- 1 dmicher dmicher 8 авг 10 01:51 a
+-rw------- 1 dmicher dmicher 8 авг 10 01:51 b
+
+Задание 4
+~/lesson3$ sudo adduser taskuser
+обавляется пользователь «taskuser» ...
+Добавляется новая группа «taskuser» (1001) ...
+Добавляется новый пользователь «taskuser» (1001) в группу «taskuser» ...
+Создаётся домашний каталог «/home/taskuser» ...
+Копирование файлов из «/etc/skel» ...
+Новый пароль : 
+Повторите ввод нового пароля : 
+passwd: пароль успешно обновлён
+Изменение информации о пользователе taskuser
+Введите новое значение или нажмите ENTER для выбора значения по умолчанию
+        Полное имя []: task user 3.4
+        Номер комнаты []: 99
+        Рабочий телефон []: 88
+        Домашний телефон []: 77
+        Другое []: other
+Данная информация корректна? [Y/n] Y
+~/lesson3$ grep taskuser /etc/passwd
+taskuser:x:1001:1001:task user 3.4,99,88,77,other:/home/taskuser:/bin/bash
+~/lesson3$ sudo vim /etc/group
+~/lesson3$ grep taskuser /etc/group
+sudo:x:27:dmicher,taskuser
+taskuser:x:1001:
+~/lesson3$ su taskuser
+Пароль: 
+taskuser@geekbrains-debian-machine:/home/dmicher/lesson3$ sudo -i
+Мы полагаем, что ваш системный администратор изложил вам основы
+безопасности. Как правило, всё сводится к трём следующим правилам:
+    №1) Уважайте частную жизнь других.
+    №2) Думайте, прежде что-то вводить.
+    №3) С большой властью приходит большая ответственность.
+[sudo] пароль для taskuser: 
+root@geekbrains-debian-machine:~#
+
+Задание 5
+$ sudo addgroup developer
+Добавляется группа «developer» (GID 1001) ...
+Готово.
+$ sudo adduser usr1
+$ sudo adduser usr2
+$ sudo usermod -a -G developer usr1
+$ sudo usermod -a -G developer usr2
+$ grep 'usr*' /etc/group
+developer:x:1001:usr1,usr2
+usr1:x:1002:
+usr2:x:1003:
+$ sudo chgrp -R developer taskdev
+$ sudo chmod g+ws taskdev
+$ ls -l | grep taskdev
+drwxrwsr-x   2 root developer  4096 авг 10 02:29 taskdev
+$ su usr1
+Пароль: 
+usr2@geekbrains-debian-machine:/$ echo 'hello' > ./taskdev/file
+usr2@geekbrains-debian-machine:/$ chmod g+w ./taskdev/file
+usr2@geekbrains-debian-machine:/$ $ exit
+$ su usr2
+Пароль: 
+usr2@geekbrains-debian-machine:/$ echo 'world' >> ./taskdev/file
+usr2@geekbrains-debian-machine:/$ exit
+$ sudo cat < ./taskdev/file 
+hello
+world
+
+Задание 6
+Стёр все изменения от предыдущего задания (в т.ч. группу и пользователей).
+Принципиальное решение следующее:
+$ sudo mkdir share
+$ sudo chmod g+w,o+wrt share 
+$ ls -l | grep share
+drwxrwxrwt   2 root group  4096 авг 10 02:54 share
+
+Задание 7
+$ mkdir 
+$ echo 'world' > ./task3-7/hello
+...(другие файлы)
+$ chmod 111 task3-7/
+$ ls task3-7
+ls: невозможно открыть каталог 'task3-7': Отказано в доступе
+$ cat < task3-7/hello
+world
