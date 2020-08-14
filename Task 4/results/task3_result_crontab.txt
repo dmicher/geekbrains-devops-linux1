@@ -1,0 +1,6 @@
+crontab -e
+> @daily /tmp/script3.sh
+> :wq
+cat < /tmp/space.txt
+> date dir size
+> 2020-08-14 /home/dmicher 7,4G
