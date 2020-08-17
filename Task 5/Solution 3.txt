@@ -1,0 +1,13 @@
+dmicher@geekbrains-debian-machine:~$ sudo vim /etc/network/interfaces
+dmicher@geekbrains-debian-machine:~$ tail -n 1 /etc/network/interfaces
+dns-nameservers 1.1.1.1 1.0.0.1
+dmicher@geekbrains-debian-machine:~$ sudo service networking restart
+dmicher@geekbrains-debian-machine:~$ ping ya.ru -c 2
+PING ya.ru (87.250.250.242) 56(84) bytes of data.
+64 bytes from ya.ru (87.250.250.242): icmp_seq=1 ttl=251 time=7.14 ms
+64 bytes from ya.ru (87.250.250.242): icmp_seq=2 ttl=251 time=8.70 ms
+
+--- ya.ru ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 3ms
+rtt min/avg/max/mdev = 7.143/7.922/8.701/0.779 ms
+---------------------------- Добавил и второй адрес Cloudflare ---------------
